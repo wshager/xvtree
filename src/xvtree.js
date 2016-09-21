@@ -8,53 +8,10 @@ import { stripBOM, element, attribute, text, cdata, comment, processingInstructi
 
 const hasProp = {}.hasOwnProperty;
 
-var defaults = {
-	validator: null,
-	xmlns: true,
-	async: false,
-	strict: true,
-	chunkSize: 10000
-};
-
 export class Parser extends EventEmitter {
-	constructor(opts) {
-		var key, ref, value;
+	constructor() {
 		super();
-		this.options = {};
-		ref = defaults;
-		for (key in ref) {
-			if (!hasProp.call(ref, key)) continue;
-			value = ref[key];
-			this.options[key] = value;
-		}
-		for (key in opts) {
-			if (!hasProp.call(opts, key)) continue;
-			value = opts[key];
-			this.options[key] = value;
-		}
 		this.reset();
-		return this;
-	}
-	processAsync() {
-		var chunk;
-		try {
-			if (this.remaining.length <= this.options.chunkSize) {
-				chunk = this.remaining;
-				this.remaining = '';
-				this.saxParser = this.saxParser.write(chunk);
-				return this.saxParser.close();
-			} else {
-				chunk = this.remaining.substr(0, this.options.chunkSize);
-				this.remaining = this.remaining.substr(this.options.chunkSize, this.remaining.length);
-				this.saxParser = this.saxParser.write(chunk);
-				return setImmediate(this.processAsync);
-			}
-		} catch (err) {
-			if (!this.saxParser.errThrown) {
-				this.saxParser.errThrown = true;
-				return this.emit(err);
-			}
-		}
 	}
 	assignOrPush(obj, newValue) {
 		newValue._parent = obj;
@@ -63,7 +20,7 @@ export class Parser extends EventEmitter {
 	reset() {
 		var stack;
 		this.removeAllListeners();
-		this.saxParser = sax.parser(this.options.strict, {
+		this.saxParser = sax.parser(true, {
 			trim: false,
 			normalize: false,
 			xmlns: true
@@ -187,11 +144,6 @@ export class Parser extends EventEmitter {
 				return true;
 			}
 			str = stripBOM(str);
-			if (this.options.async) {
-				this.remaining = str;
-				setImmediate(this.processAsync);
-				return this.saxParser;
-			}
 			return this.saxParser.write(str).close();
 		} catch (err) {
 			if (!(this.saxParser.errThrown || this.saxParser.ended)) {
@@ -205,21 +157,7 @@ export class Parser extends EventEmitter {
 	}
 }
 
-export default function parseString(str, a, b) {
-    var cb, options;
-    if (b !== null) {
-    	if (typeof b === 'function') {
-    		cb = b;
-    	}
-    	if (typeof a === 'object') {
-    		options = a;
-    	}
-    } else {
-    	if (typeof a === 'function') {
-    		cb = a;
-    	}
-    	options = {};
-    }
-    var parser = new Parser(options);
+export default function parseString(str, cb) {
+    var parser = new Parser();
     return parser.parseString(str, cb);
 }

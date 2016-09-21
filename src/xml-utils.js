@@ -39,7 +39,6 @@ export class Node extends Seq {
 		this._cache = {}; // for select by name
 		this._owner = null; // TODO have elem create it, or explicitly through createDocument
 		this._parent = null;
-		return this;
 	}
 }
 
