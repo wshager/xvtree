@@ -7,7 +7,7 @@
     "vnode",
     "virtual dom"
   ],
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Wouter Hager <wshager@gmail.com> (https://lagua.nl)",
   "contributors": [],
   "main": "./lib/xvtree",
