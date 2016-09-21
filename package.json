@@ -1,0 +1,30 @@
+{
+  "name": "xmutable",
+  "description": "Parser for Immmutable XML.",
+  "keywords": [
+    "xml",
+    "immutable"
+  ],
+  "version": "0.0.1",
+  "author": "Wouter Hager <wshager@gmail.com> (https://lagua.nl)",
+  "contributors": [
+
+  ],
+  "main": "./lib/xmutable",
+  "files": [
+    "lib"
+  ],
+  "directories": {
+    "lib": "./lib"
+  },
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wshager/xmutable.git"
+  },
+  "dependencies": {
+    "sax": ">=0.6.0"
+  },
+  "license": "BSD 2.0"
+}
