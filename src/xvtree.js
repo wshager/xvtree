@@ -2,13 +2,19 @@ import * as sax from 'sax';
 
 import { EventEmitter } from 'events';
 
-import * as bom from './bom';
-
 import { setImmediate } from 'timers';
 
 import { Seq } from 'immutable';
 
 const hasProp = {}.hasOwnProperty;
+
+function stripBOM(str) {
+	if (str[0] === '\uFEFF') {
+		return str.substring(1);
+	} else {
+		return str;
+	}
+}
 
 function isNode(maybe){
 	return !!(maybe && maybe._isNode);
@@ -16,20 +22,18 @@ function isNode(maybe){
 
 class Node extends Seq {
 	constructor(type, name, attrs, children) {
-		children = Seq.isSeq(children) ? children.toArray() : children instanceof Array ? children : [children];
-		var x = super(children);
-		x.forEach(function(_) {
-			if (isNode(_)) _._parent = x;
-		});
-		x._name = name;
-		//x._value = value;
-		x._attrs = attrs;
-		x._isNode = true;
-		x._type = type;
-		x._cache = {}; // for select by name
-		x._owner = null; // have elem create it, or explicitly through createDocument
-		x._parent = null;
-		return x;
+		super(Seq.isSeq(children) ? children.toArray() : children instanceof Array ? children : [children]);
+		this.forEach(function(_) {
+			if (isNode(_)) _._parent = this;
+		},this);
+		this._name = name;
+		this._attrs = attrs;
+		this._isNode = true;
+		this._type = type;
+		this._cache = {}; // for select by name
+		this._owner = null; // TODO have elem create it, or explicitly through createDocument
+		this._parent = null;
+		return this;
 	}
 }
 
@@ -81,9 +85,7 @@ var defaults = {
 export class Parser extends EventEmitter {
 	constructor(opts) {
 		var key, ref, value;
-		if (!(this instanceof Parser)) {
-			return new Parser(opts);
-		}
+		super();
 		this.options = {};
 		ref = defaults;
 		for (key in ref) {
@@ -97,6 +99,7 @@ export class Parser extends EventEmitter {
 			this.options[key] = value;
 		}
 		this.reset();
+		return this;
 	}
 	processAsync() {
 		var chunk;
@@ -250,7 +253,7 @@ export class Parser extends EventEmitter {
 				this.emit("end", null);
 				return true;
 			}
-			str = bom.stripBOM(str);
+			str = stripBOM(str);
 			if (this.options.async) {
 				this.remaining = str;
 				setImmediate(this.processAsync);
