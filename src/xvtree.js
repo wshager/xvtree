@@ -4,75 +4,9 @@ import { EventEmitter } from 'events';
 
 import { setImmediate } from 'timers';
 
-import { Seq } from 'immutable';
+import { stripBOM, element, attribute, text, cdata, comment, processingInstruction, qname } from './xml-utils';
 
 const hasProp = {}.hasOwnProperty;
-
-function stripBOM(str) {
-	if (str[0] === '\uFEFF') {
-		return str.substring(1);
-	} else {
-		return str;
-	}
-}
-
-function isNode(maybe){
-	return !!(maybe && maybe._isNode);
-}
-
-class Node extends Seq {
-	constructor(type, name, attrs, children) {
-		super(Seq.isSeq(children) ? children.toArray() : children instanceof Array ? children : [children]);
-		this.forEach(function(_) {
-			if (isNode(_)) _._parent = this;
-		},this);
-		this._name = name;
-		this._attrs = attrs;
-		this._isNode = true;
-		this._type = type;
-		this._cache = {}; // for select by name
-		this._owner = null; // TODO have elem create it, or explicitly through createDocument
-		this._parent = null;
-		return this;
-	}
-}
-
-class QName {
-	constructor(uri,name){
-        this._isQName = true;
-		this._name = name;
-        this._uri = uri;
-	}
-}
-
-function element($qname, $children) {
-	return new Node(1, $qname, null, $children);
-}
-
-function attribute($qname, $value) {
-	return new Node(2, $qname, null, $value);
-}
-
-function text($value) {
-	return new Node(3, null, null, $value);
-}
-
-function cdata($value) {
-	return new Node(4, null, null, $value);
-}
-
-function comment($value) {
-	return new Node(8, null, null, $value);
-}
-
-function processingInstruction($name, $value) {
-	return new Node(7, $name, null, $value);
-}
-
-function qname($uri, $name) {
-    return new QName($uri, $name);
-}
-
 
 var defaults = {
 	validator: null,
@@ -184,7 +118,6 @@ export class Parser extends EventEmitter {
 				}
 				nodeName = qname(node.uri, node.name);
 			}
-			//console.log(nodeType,nodeName);
 			var elm = element(nodeName, ret);
 			return stack.push(elm);
 		}).bind(this);
@@ -196,7 +129,7 @@ export class Parser extends EventEmitter {
 			if (stack.length > 0) {
 				return this.assignOrPush(s, obj);
 			} else {
-				this.resultObject = obj.asImmutable();
+				this.resultObject = obj;
 				this.saxParser.ended = true;
 				return this.emit("end", this.resultObject);
 			}
