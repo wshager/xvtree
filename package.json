@@ -7,7 +7,7 @@
     "vnode",
     "virtual dom"
   ],
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "Wouter Hager <wshager@gmail.com> (https://lagua.nl)",
   "contributors": [],
   "main": "./lib/xvtree",
@@ -25,7 +25,7 @@
   "dependencies": {
     "events": "^1.1.1",
     "sax": "^1.2.1",
-    "xvnode": "0.0.2"
+    "xvnode": "0.0.5"
   },
   "license": "BSD-3-Clause",
   "bugs": {
