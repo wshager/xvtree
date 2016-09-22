@@ -2,9 +2,9 @@ import * as sax from 'sax';
 
 import { EventEmitter } from 'events';
 
-import { setImmediate } from 'timers';
+import { element, attribute, text, cdata, comment, processingInstruction, qname } from 'xvnode';
 
-import { stripBOM, element, attribute, text, cdata, comment, processingInstruction, qname } from './xml-utils';
+import { stripBOM } from "./bom";
 
 const hasProp = {}.hasOwnProperty;
 
