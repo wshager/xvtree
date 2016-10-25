@@ -5,7 +5,7 @@ var parser = new xvtree.Parser();
 function parse(xml){
 	parser.parseString(xml,function(err,doc){
 		if(err) return console.error(err);
-		console.log(doc);
+		console.log(doc.toString());
 	});
 }
 
